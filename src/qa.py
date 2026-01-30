@@ -1,47 +1,30 @@
 import os
-from llama_cpp import Llama
+from groq import Groq
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL_PATH = os.path.join(BASE_DIR, "models", "phi-2.Q4_K_M.gguf")
+def answer_question(context: str, question: str, prompt_template: str) -> str:
+    """
+    Generate an answer using Groq LLM based on retrieved context.
+    """
 
-llm = Llama(
-    model_path=MODEL_PATH,
-    n_ctx=2048,
-    n_threads=6,
-    n_batch=64,
-    verbose=False
-)
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        return "Error: GROQ_API_KEY not found."
 
-def answer_question(context, question, prompt):
-    if context is None:
-        return (
-            "Answer:\n"
-            "The provided documents do not contain this information.\n\n"
-            "Evidence:\n"
-            "No relevant policy text found.\n\n"
-            "Confidence:\n"
-            "Low"
-        )
+    client = Groq(api_key=api_key)
 
-    full_prompt = f"""
-### Instruction:
-You are a policy assistant. Answer the question using ONLY the context below.
-If the answer is not present, say so clearly.
-
-### Context:
-{context}
-
-### Question:
-{question}
-
-### Answer:
-"""
-
-    output = llm(
-        full_prompt,
-        max_tokens=150,
-        temperature=0.0,
-        stop=["###"]
+    prompt = prompt_template.format(
+        context=context,
+        question=question
     )
 
-    return output["choices"][0]["text"].strip()
+    response = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[
+            {"role": "system", "content": "You are a precise policy assistant. Answer strictly from the context."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.2,
+        max_tokens=400
+    )
+
+    return response.choices[0].message.content.strip()
