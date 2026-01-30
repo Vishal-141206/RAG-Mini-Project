@@ -1,0 +1,26 @@
+Cancellation Policy
+
+This Cancellation Policy outlines the terms under which customers may cancel orders placed on our platform.
+
+Order Cancellation Window
+Customers may cancel an order within 24 hours of placing it without any penalty, provided the order has not yet been shipped.
+
+Orders After Shipment
+Once an order has been shipped, cancellation is no longer possible. In such cases, customers must wait for delivery and then initiate a return request in accordance with the Refund Policy.
+
+How to Request Cancellation
+Cancellation requests must be submitted through the customer account dashboard or by contacting customer support. Requests submitted through unofficial channels will not be accepted.
+
+Refunds After Cancellation
+If a cancellation request is approved:
+- Any prepaid amount will be refunded using the original payment method.
+- Refund processing timelines will follow the standard refund process.
+- No additional cancellation fee is charged for cancellations made within the allowed window.
+
+Exceptions
+The company may refuse cancellation requests in cases such as:
+- Orders involving customized or made-to-order products
+- Bulk or corporate orders
+- Suspected misuse or fraudulent activity
+
+The company reserves the right to cancel orders unilaterally in case of pricing errors, stock unavailability, or policy violations.
