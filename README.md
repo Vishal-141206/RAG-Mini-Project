@@ -1,74 +1,165 @@
+# RAG Policy Assistant – Retrieval-Augmented Question Answering System
+
+A production-ready **Retrieval-Augmented Generation (RAG)** application that answers user queries strictly based on company policy documents.  
+The system is designed to **avoid hallucinations**, provide **grounded evidence**, and handle **unanswerable queries safely**.
+
+🔗 **Live Demo:** https://Vishal1412-rag-policy.hf.space
+
 ---
-title: RAG Policy Assistant
-emoji: 🤖
-colorFrom: blue
-colorTo: purple
-sdk: streamlit
-app_file: app.py
-pinned: false
+
+## Problem Statement
+
+Large Language Models often hallucinate when asked factual or policy-based questions.  
+This project demonstrates how to mitigate that issue by combining **semantic retrieval** with **controlled generation**, ensuring answers are derived only from verified documents.
+
 ---
 
-# RAG Mini Project – Policy QA Assistant
+## System Architecture
 
-## Architecture Overview
-The system follows a basic Retrieval-Augmented Generation (RAG) flow:
+The system follows a standard but carefully implemented RAG pipeline:
 
-Documents → Chunking → Embeddings → Vector Store → Semantic Retrieval → LLM → Answer
+Policy Documents
+↓
+Document Chunking
+↓
+Sentence Embeddings
+↓
+Vector Store (ChromaDB)
+↓
+Semantic Retrieval (Top-K)
+↓
+LLM with Grounding Prompt
+↓
+Structured Answer (Answer + Evidence + Confidence)
+
+---
+
+
+Each component is modular and replaceable without affecting the rest of the pipeline.
 
 ---
 
 ## Data Preparation
-Policy documents are loaded as plain text and split into chunks using
-`RecursiveCharacterTextSplitter`.
 
-- Chunk size: 400 characters
-- Chunk overlap: 80 characters
+- Policy documents are stored as plain text files.
+- Documents are split using `RecursiveCharacterTextSplitter`.
 
-This size preserves clause-level meaning in policy text while overlap prevents
-information loss at chunk boundaries.
+**Chunking configuration:**
+- Chunk size: **400 characters**
+- Chunk overlap: **80 characters**
+
+This preserves clause-level meaning while preventing context loss at chunk boundaries.
 
 ---
 
-## RAG Pipeline
-- Embeddings: `sentence-transformers/all-MiniLM-L6-v2`
-- Vector store: Chroma
-- Retrieval: semantic similarity search with top-k = 3
-- Retrieved chunks are passed to the LLM as context
+## Embeddings & Vector Store
 
-Limiting retrieval to top-k reduces irrelevant context and hallucinations.
+- **Embedding model:** `sentence-transformers/all-MiniLM-L6-v2`
+- **Vector store:** ChromaDB (persistent, lightweight)
+- **Similarity search:** cosine similarity
+
+Embeddings are generated once per session and cached to reduce redundant computation.
+
+---
+
+## Retrieval Strategy
+
+- **Top-K retrieval:** `k = 3`
+- Only the most semantically relevant chunks are passed to the LLM.
+
+This constraint:
+- reduces irrelevant context
+- improves answer precision
+- significantly lowers hallucination risk
 
 ---
 
 ## Prompt Engineering
-The prompt explicitly instructs the model to:
-- Answer only from retrieved context
-- Avoid using prior knowledge
-- Clearly refuse when information is missing
-- Return a structured response (Answer, Evidence, Confidence)
 
-This prompt design improves grounding and answer reliability.
+The prompt enforces strict grounding rules:
+
+- Use **only** retrieved context
+- No prior knowledge or assumptions
+- Explicit refusal when information is missing
+- Structured output format:
+  - **Answer**
+  - **Evidence**
+  - **Confidence**
+
+This ensures responses are:
+- interpretable
+- auditable
+- evaluator-friendly
 
 ---
 
-## Evaluation
-A small evaluation set includes:
-- Fully answerable questions
-- Partially answerable questions
-- Unanswerable questions
+## LLM Integration
 
-Evaluation focuses on accuracy, hallucination avoidance, and clarity.
-Results are recorded in `eval/evaluation.md`.
+- **Inference:** Groq-hosted LLM (LLaMA-3.1 family)
+- API-based inference for reliability and low latency
+- No local model assumptions in deployment
+
+The LLM layer is fully modular and can be swapped without changing the RAG pipeline.
 
 ---
 
 ## Edge Case Handling
-- If no relevant documents are retrieved, the system responds that the information
-  is not available.
-- If the question is outside the knowledge base, the system explicitly refuses.
+
+The system explicitly handles failure modes:
+
+- **No relevant retrieval:** responds that information is not available
+- **Partially answerable queries:** answers only what is supported by context
+- **Out-of-scope queries:** safely refused
+
+This behavior is intentional and evaluated.
 
 ---
 
-## LLM Note
-A local instruction-tuned LLM is used for generation to ensure deterministic,
-offline execution. The LLM component is modular and can be replaced without
-changes to the RAG pipeline.
+## Evaluation Methodology
+
+A small evaluation set is used to test:
+
+- Fully answerable questions
+- Partially answerable questions
+- Unanswerable questions
+
+Evaluation criteria:
+- Answer correctness
+- Grounding and evidence usage
+- Hallucination avoidance
+- Clarity and structure
+
+Results are documented separately.
+
+---
+
+## Tech Stack
+
+- **Python**
+- **LangChain**
+- **Sentence Transformers**
+- **ChromaDB**
+- **Groq API**
+- **Streamlit**
+- **Hugging Face Spaces (deployment)**
+
+---
+
+## Key Design Decisions
+
+- Explicit refusal is preferred over speculative answers
+- Evidence is mandatory for trust and auditability
+- Retrieval is limited to reduce noise
+- Caching is used to improve runtime efficiency
+
+---
+
+## What This Project Demonstrates
+
+- Practical understanding of RAG systems
+- Awareness of LLM failure modes
+- Prompt engineering for safety and reliability
+- Real-world deployment and debugging experience
+- Clean, modular system design
+
+---
