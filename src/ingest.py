@@ -7,9 +7,9 @@ def load_documents():
     documents = []
 
     files = [
-        "refund_policy.txt",
-        "cancellation_policy.txt",
-        "shipping_policy.txt",
+        "refund.txt",
+        "cancel.txt",
+        "ship.txt",
     ]
 
     for file in files:
