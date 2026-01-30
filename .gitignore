@@ -10,11 +10,6 @@ venv/
 # Vector database
 db/
 
-# Data files
-data/
-
-# Models
-models/
 
 # OS
 .DS_Store
