@@ -1,184 +1,215 @@
 # RAG Policy Assistant – Retrieval-Augmented Question Answering System
 
-A production-ready **Retrieval-Augmented Generation (RAG)** application that answers user queries strictly based on company policy documents.  
-The system is designed to **avoid hallucinations**, provide **grounded evidence**, and handle **unanswerable queries safely**.
+A production-ready Retrieval-Augmented Generation (RAG) application that answers user queries strictly based on company policy documents.  
+The system is designed to avoid hallucinations, provide grounded evidence, and handle unanswerable queries safely.
 
-🔗 **Live Demo:** https://Vishal1412-rag-policy.hf.space
+Live Demo: https://Vishal1412-rag-policy.hf.space
 
 ---
 
 ## Objective
 
-The goal of this project is to build a lightweight Retrieval-Augmented Generation (RAG) system that showcases practical skills in working with large language models. The project focuses on writing strong, constraint-based prompts, refining model outputs through iteration, and critically analyzing responses to ensure accuracy and reliability.
+The goal of this project is to build a lightweight Retrieval-Augmented Generation (RAG) system that demonstrates practical skills in working with large language models. The focus is on designing constraint-based prompts, refining response quality through iteration, and critically evaluating model outputs for correctness and reliability.
 
-The system is designed to emphasize correctness, transparency, and responsible model behavior rather than fluent but unsupported answers.
+The system prioritizes factual accuracy, transparency, and responsible model behavior over fluent but unsupported answers.
 
 ---
 
 ## Problem Statement
 
-A collection of internal company policy documents is provided, including policies related to refunds, order cancellations, and shipping. The objective is to develop a question-answering assistant that can intelligently search these documents and respond to user queries.
+A collection of internal company policy documents is provided, including policies related to refunds, order cancellations, and shipping. The task is to develop a question-answering assistant that can intelligently retrieve relevant information from these documents and respond to user queries.
 
 The assistant should:
-- Identify and retrieve the most relevant sections from the policy documents
-- Generate answers that are strictly grounded in the retrieved content
+- Retrieve the most relevant sections from the policy documents
+- Generate answers that are strictly grounded in retrieved content
 - Avoid fabricating information when the documents do not contain an answer
-- Follow a structured prompting approach that makes responses clear and easy to verify
+- Use structured prompts to ensure clarity and verifiability
 
-This problem simulates a real-world scenario where language models must operate under strict factual constraints and demonstrate reliable behavior in enterprise or policy-driven applications.
+This setup reflects real-world scenarios where language models must operate under strict factual constraints.
 
 ---
 
-## System Architecture
+## Setup Instructions
 
-The system follows a standard but carefully implemented RAG pipeline:
+1. Clone the repository
+
+    git clone https://github.com/Vishal-141206/RAG-Mini-Project  
+    cd RAG-Mini-Project  
+
+2. Create and activate a virtual environment
+
+    python -m venv venv  
+    source venv/bin/activate  
+
+3. Install dependencies
+
+    pip install -r requirements.txt  
+
+4. Set environment variables
+
+    export GROQ_API_KEY=your_api_key_here  
+
+5. Run the application
+
+    streamlit run app.py  
+
+The application will be available at http://localhost:8501.
+
+---
 
 ## System Architecture
 
 The system follows a standard but carefully implemented Retrieval-Augmented Generation (RAG) pipeline:
 
 Policy Documents  
-⟶ 
+⟶
 Document Chunking  
-⟶ 
+⟶
 Sentence Embeddings  
-⟶ 
+⟶
 Vector Store (ChromaDB)  
-⟶ 
+⟶
 Semantic Retrieval (Top-K)  
-⟶ 
+⟶
 LLM with Grounded Prompt  
 ⟶
 Structured Answer (Answer + Evidence + Confidence)
 
-
----
-
-
-Each component is modular and replaceable without affecting the rest of the pipeline.
+Each component is modular and replaceable.
 
 ---
 
 ## Data Preparation
 
 - Policy documents are stored as plain text files.
-- Documents are split using `RecursiveCharacterTextSplitter`.
+- Documents are split using RecursiveCharacterTextSplitter.
 
-**Chunking configuration:**
-- Chunk size: **400 characters**
-- Chunk overlap: **80 characters**
+Chunking configuration:
+- Chunk size: 400 characters
+- Chunk overlap: 80 characters
 
-This preserves clause-level meaning while preventing context loss at chunk boundaries.
+This preserves clause-level meaning while reducing context loss at chunk boundaries.
 
 ---
 
 ## Embeddings & Vector Store
 
-- **Embedding model:** `sentence-transformers/all-MiniLM-L6-v2`
-- **Vector store:** ChromaDB (persistent, lightweight)
-- **Similarity search:** cosine similarity
+- Embedding model: sentence-transformers/all-MiniLM-L6-v2
+- Vector store: ChromaDB
+- Similarity metric: cosine similarity
 
-Embeddings are generated once per session and cached to reduce redundant computation.
+Embeddings are generated once per session and cached to improve efficiency.
 
 ---
 
 ## Retrieval Strategy
 
-- **Top-K retrieval:** `k = 3`
-- Only the most semantically relevant chunks are passed to the LLM.
+- Top-K retrieval: k = 3
+- Only the most relevant chunks are passed to the LLM
 
 This constraint:
 - reduces irrelevant context
 - improves answer precision
 - significantly lowers hallucination risk
 
+
 ---
 
-## Prompt Engineering
+## Prompt Used
 
-The prompt enforces strict grounding rules:
+The system uses a strict grounding prompt to enforce reliable behavior:
 
-- Use **only** retrieved context
-- No prior knowledge or assumptions
-- Explicit refusal when information is missing
-- Structured output format:
-  - **Answer**
-  - **Evidence**
-  - **Confidence**
+    You are a policy-compliance assistant.
 
-This ensures responses are:
-- interpretable
-- auditable
-- evaluator-friendly
+    Rules:
+    - Use ONLY the information provided in the context.
+    - Do NOT use prior knowledge or assumptions.
+    - If the answer is not present, clearly state that it is unavailable.
+    - Do NOT guess or infer missing details.
+
+    Context:
+    {context}
+
+    Question:
+    {question}
+
+    Answer format:
+    Answer:
+    Evidence:
+    Confidence:
+
+This prompt design ensures responses are grounded, auditable, and safe.
 
 ---
 
 ## LLM Integration
 
-- **Inference:** Groq-hosted LLM (LLaMA-3.1 family)
-- API-based inference for reliability and low latency
-- No local model assumptions in deployment
-
-The LLM layer is fully modular and can be swapped without changing the RAG pipeline.
+- Inference is performed using a Groq-hosted LLM (LLaMA-3.1 family)
+- API-based inference ensures low latency and reliability
+- The LLM component is modular and can be replaced without changing the RAG pipeline
 
 ---
 
 ## Edge Case Handling
 
-The system explicitly handles failure modes:
-
-- **No relevant retrieval:** responds that information is not available
-- **Partially answerable queries:** answers only what is supported by context
-- **Out-of-scope queries:** safely refused
-
-This behavior is intentional and evaluated.
+The system explicitly handles failure scenarios:
+- No relevant retrieval results in a clear “information not available” response
+- Partially supported questions are answered only where context exists
+- Out-of-scope queries are safely refused
 
 ---
 
-## Evaluation Methodology
+## Evaluation Results
 
-A small evaluation set is used to test:
+The system was evaluated using a small set of representative questions:
 
-- Fully answerable questions
-- Partially answerable questions
-- Unanswerable questions
+| Question | Coverage | Result |
+|--------|---------|--------|
+| What is the refund policy? | Fully answerable | ✅ |
+| Can an order be cancelled after shipping? | Fully answerable | ✅ |
+| Are international returns supported? | Not covered | ❌ (Correct refusal) |
+| Is there a cancellation fee for bulk orders? | Partially covered | ⚠️ |
+| What payment methods are supported? | Not covered | ❌ |
 
-Evaluation criteria:
-- Answer correctness
-- Grounding and evidence usage
-- Hallucination avoidance
-- Clarity and structure
+Legend:
+- ✅ Correct and grounded  
+- ⚠️ Partially supported  
+- ❌ Information unavailable (hallucination avoided)
 
-Results are documented separately.
+---
+
+## Trade-offs and Future Improvements
+
+Trade-offs:
+- Smaller chunk sizes improve retrieval precision but increase embedding count
+- Limiting retrieval to top-k reduces hallucinations but may omit weaker signals
+- Strict refusal behavior improves safety but may reduce perceived completeness
+
+Future improvements:
+- Automated evaluation with labeled QA pairs
+- Support for PDF and HTML document ingestion
+- Re-ranking of retrieved chunks
+- Multi-turn conversational memory
 
 ---
 
 ## Tech Stack
 
-- **Python**
-- **LangChain**
-- **Sentence Transformers**
-- **ChromaDB**
-- **Groq API**
-- **Streamlit**
-- **Hugging Face Spaces (deployment)**
-
----
-
-## Key Design Decisions
-
-- Explicit refusal is preferred over speculative answers
-- Evidence is mandatory for trust and auditability
-- Retrieval is limited to reduce noise
-- Caching is used to improve runtime efficiency
+- Python
+- LangChain
+- Sentence Transformers
+- ChromaDB
+- Groq API
+- Streamlit
+- Hugging Face Spaces
 
 ---
 
 ## What This Project Demonstrates
 
-- Practical understanding of RAG systems
-- Awareness of LLM failure modes
-- Prompt engineering for safety and reliability
+- Practical understanding of Retrieval-Augmented Generation
+- Prompt engineering for hallucination control
+- Evaluation-driven LLM development
 - Real-world deployment and debugging experience
 - Clean, modular system design
 
