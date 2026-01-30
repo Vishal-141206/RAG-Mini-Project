@@ -7,10 +7,25 @@ The system is designed to **avoid hallucinations**, provide **grounded evidence*
 
 ---
 
+## Objective
+
+The goal of this project is to build a lightweight Retrieval-Augmented Generation (RAG) system that showcases practical skills in working with large language models. The project focuses on writing strong, constraint-based prompts, refining model outputs through iteration, and critically analyzing responses to ensure accuracy and reliability.
+
+The system is designed to emphasize correctness, transparency, and responsible model behavior rather than fluent but unsupported answers.
+
+---
+
 ## Problem Statement
 
-Large Language Models often hallucinate when asked factual or policy-based questions.  
-This project demonstrates how to mitigate that issue by combining **semantic retrieval** with **controlled generation**, ensuring answers are derived only from verified documents.
+A collection of internal company policy documents is provided, including policies related to refunds, order cancellations, and shipping. The objective is to develop a question-answering assistant that can intelligently search these documents and respond to user queries.
+
+The assistant should:
+- Identify and retrieve the most relevant sections from the policy documents
+- Generate answers that are strictly grounded in the retrieved content
+- Avoid fabricating information when the documents do not contain an answer
+- Follow a structured prompting approach that makes responses clear and easy to verify
+
+This problem simulates a real-world scenario where language models must operate under strict factual constraints and demonstrate reliable behavior in enterprise or policy-driven applications.
 
 ---
 
@@ -18,19 +33,24 @@ This project demonstrates how to mitigate that issue by combining **semantic ret
 
 The system follows a standard but carefully implemented RAG pipeline:
 
-Policy Documents
-↓
-Document Chunking
-↓
-Sentence Embeddings
-↓
-Vector Store (ChromaDB)
-↓
-Semantic Retrieval (Top-K)
-↓
-LLM with Grounding Prompt
-↓
+## System Architecture
+
+The system follows a standard but carefully implemented Retrieval-Augmented Generation (RAG) pipeline:
+
+Policy Documents  
+⟶ 
+Document Chunking  
+⟶ 
+Sentence Embeddings  
+⟶ 
+Vector Store (ChromaDB)  
+⟶ 
+Semantic Retrieval (Top-K)  
+⟶ 
+LLM with Grounded Prompt  
+⟶
 Structured Answer (Answer + Evidence + Confidence)
+
 
 ---
 
