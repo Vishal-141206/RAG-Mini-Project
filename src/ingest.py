@@ -1,21 +1,21 @@
 from langchain_community.document_loaders import TextLoader
+import os
+
+DATA_DIR = "policy_docs"
 
 def load_documents():
     documents = []
 
-    documents += TextLoader(
-        "data/refund_policy.txt",
-        encoding="utf-8"
-    ).load()
+    files = [
+        "refund_policy.txt",
+        "cancellation_policy.txt",
+        "shipping_policy.txt",
+    ]
 
-    documents += TextLoader(
-        "data/cancellation_policy.txt",
-        encoding="utf-8"
-    ).load()
-
-    documents += TextLoader(
-        "data/shipping_policy.txt",
-        encoding="utf-8"
-    ).load()
+    for file in files:
+        file_path = os.path.join(DATA_DIR, file)
+        documents.extend(
+            TextLoader(file_path, encoding="utf-8").load()
+        )
 
     return documents
